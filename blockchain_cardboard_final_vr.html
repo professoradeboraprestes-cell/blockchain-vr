@@ -4,10 +4,13 @@
 <meta charset="UTF-8">
 <title>How Blockchain Works - VR 360°</title>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/loaders/FontLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/geometries/TextGeometry.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/controls/DeviceOrientationControls.js"></script>
+
+<!-- Three.js core and compatible addons -->
+<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/controls/DeviceOrientationControls.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/loaders/FontLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/geometries/TextGeometry.js"></script>
+
 <style>
   html,body{margin:0;overflow:hidden;background:black;height:100%;width:100%}
   #container{position:relative;width:100%;height:100%;}
@@ -62,7 +65,7 @@ const grid = new THREE.GridHelper(20, 40, 0x00ffff, 0x004477);
 grid.position.y = -2;
 scene.add(grid);
 
-/* -----  title text placeholder  ----- */
+/* -----  title text  ----- */
 const loader = new THREE.FontLoader();
 let titleMesh;
 loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font){
@@ -78,6 +81,7 @@ loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json
 /* -----  prepare group for blocks  ----- */
 const blocks = new THREE.Group();
 scene.add(blocks);
+
 /* -----  7 blockchain stages  ----- */
 const stages = [
  {n:1, text:"Someone requests a transaction."},
@@ -109,7 +113,7 @@ loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json
     scene.add(num);
 
     const textGeo = new THREE.TextGeometry(s.text,{font:font,size:0.18,height:0.01});
-    const textMat = new THREE.MeshStandardMaterial({color:0xffffff,emissive:0x00ffff,opacity:0});
+    const textMat = new THREE.MeshStandardMaterial({color:0xffffff,emissive:0x00ffff});
     const txt = new THREE.Mesh(textGeo,textMat);
     txt.position.set(x-2,0.5,z);
     txt.lookAt(0,1.6,0);
@@ -139,7 +143,6 @@ makeArrow("↓ Look Down",new THREE.Vector3(0,-2,-3));
 
 /* -----  focus detection  ----- */
 let raycaster=new THREE.Raycaster();
-let mouse=new THREE.Vector2();
 let focusObj=null;
 let focusTimer=null;
 
@@ -183,4 +186,3 @@ window.addEventListener('resize',()=>{
 </script>
 </body>
 </html>
-
