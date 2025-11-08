@@ -24,7 +24,7 @@
       <!-- background -->
       <a-sky color="#030314"></a-sky>
 
-      <!-- subtle lights -->
+      <!-- lights -->
       <a-entity light="type: ambient; color: #6666ff; intensity: 0.6"></a-entity>
       <a-entity
         light="type: point; color: #00ffff; intensity: 1.5; distance: 30"
@@ -39,48 +39,6 @@
 
       <!-- 7 blockchain stages -->
       <a-entity id="blocks"></a-entity>
-
-      <script>
-        const stages = [
-          "1. Someone requests a transaction.",
-          "2. The transaction is broadcast to a network of computers (nodes).",
-          "3. The network validates the transaction using algorithms.",
-          "4. A verified transaction may involve cryptocurrency, contracts, or records.",
-          "5. Once verified, the transaction is combined with others to create a new block.",
-          "6. The new block is added to the blockchain, permanent and unalterable.",
-          "7. The transaction is completed."
-        ];
-
-        const radius = 5;
-        const parent = document.querySelector("#blocks");
-
-        stages.forEach((text, i) => {
-          const angle = (i / stages.length) * Math.PI * 2;
-          const x = Math.cos(angle) * radius;
-          const z = Math.sin(angle) * radius;
-
-          const block = document.createElement("a-box");
-          block.setAttribute("color", "#00ffff");
-          block.setAttribute("emissive", "#0077ff");
-          block.setAttribute("depth", "1");
-          block.setAttribute("height", "1");
-          block.setAttribute("width", "1");
-          block.setAttribute("opacity", "0.8");
-          block.setAttribute("position", `${x} 1.6 ${z}`);
-          block.setAttribute("look-at", "#camera");
-
-          const label = document.createElement("a-entity");
-          label.setAttribute(
-            "text",
-            `value:${text}; align:center; width:6; color:#ffffff`
-          );
-          label.setAttribute("position", `${x} 3 ${z}`);
-          label.setAttribute("look-at", "#camera");
-
-          parent.appendChild(block);
-          parent.appendChild(label);
-        });
-      </script>
 
       <!-- arrows -->
       <a-entity
@@ -104,8 +62,51 @@
         look-at="#camera"
       ></a-entity>
 
-      <!-- user camera -->
+      <!-- camera -->
       <a-entity id="camera" camera look-controls position="0 1.6 0"></a-entity>
+
+      <script>
+        const stages = [
+          "1. Someone requests a transaction.",
+          "2. The transaction is broadcast to a network of computers (nodes).",
+          "3. The network validates the transaction using algorithms.",
+          "4. A verified transaction may involve cryptocurrency, contracts, or records.",
+          "5. Once verified, the transaction is combined with others to create a new block.",
+          "6. The new block is added to the blockchain, permanent and unalterable.",
+          "7. The transaction is completed."
+        ];
+
+        const radius = 6;
+        const parent = document.querySelector("#blocks");
+
+        stages.forEach((text, i) => {
+          const angle = (i / stages.length) * Math.PI * 2 + Math.PI / 2;
+          const x = Math.cos(angle) * radius;
+          const z = Math.sin(angle) * radius;
+
+          const block = document.createElement("a-box");
+          block.setAttribute("color", "#00ffff");
+          block.setAttribute("emissive", "#0077ff");
+          block.setAttribute("depth", "1.2");
+          block.setAttribute("height", "1.2");
+          block.setAttribute("width", "1.2");
+          block.setAttribute("opacity", "0.85");
+          block.setAttribute("position", `${x} 1.6 ${z}`);
+          block.setAttribute("rotation", `0 ${-angle * (180 / Math.PI)} 0`);
+
+          const label = document.createElement("a-entity");
+          label.setAttribute(
+            "text",
+            `value:${text}; align:center; width:6; color:#ffffff`
+          );
+          label.setAttribute("position", `${x} 3 ${z}`);
+          label.setAttribute("rotation", `0 ${-angle * (180 / Math.PI)} 0`);
+
+          parent.appendChild(block);
+          parent.appendChild(label);
+        });
+      </script>
     </a-scene>
   </body>
 </html>
+
