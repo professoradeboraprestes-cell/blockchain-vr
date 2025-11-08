@@ -1,102 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Blockchain Process - Interactive 3D</title>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Blockchain VR 360° Experience</title>
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
+    />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        background: black;
+      }
+      .a-enter-vr-button {
+        background-color: #8a2be2 !important;
+      }
+    </style>
+  </head>
 
-<!-- Three.js core -->
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/loaders/FontLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/geometries/TextGeometry.js"></script>
+  <body>
+    <a-scene>
+      <!-- background -->
+      <a-sky color="#030314"></a-sky>
 
-<style>
-  html,body{margin:0;overflow:hidden;background:black;height:100%;width:100%}
-  #info{position:absolute;top:10px;left:10px;color:#0ff;font-family:sans-serif;font-size:14px;}
-</style>
-</head>
-<body>
-<div id="info">Touch and drag to look around</div>
-<script>
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x02040a);
+      <!-- subtle lights -->
+      <a-entity light="type: ambient; color: #6666ff; intensity: 0.6"></a-entity>
+      <a-entity
+        light="type: point; color: #00ffff; intensity: 1.5; distance: 30"
+        position="0 3 5"
+      ></a-entity>
 
-const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
-camera.position.set(0,1.6,5);
+      <!-- title -->
+      <a-entity
+        text="value: HOW BLOCKCHAIN WORKS; color: #00ffff; align: center; width: 8"
+        position="0 3 -5"
+      ></a-entity>
 
-const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
-document.body.appendChild(renderer.domElement);
+      <!-- 7 blockchain stages -->
+      <a-entity id="blocks"></a-entity>
 
-const controls=new THREE.OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true;
-controls.dampingFactor=0.05;
-controls.enablePan=false;
-controls.minDistance=3;
-controls.maxDistance=8;
+      <script>
+        const stages = [
+          "1. Someone requests a transaction.",
+          "2. The transaction is broadcast to a network of computers (nodes).",
+          "3. The network validates the transaction using algorithms.",
+          "4. A verified transaction may involve cryptocurrency, contracts, or records.",
+          "5. Once verified, the transaction is combined with others to create a new block.",
+          "6. The new block is added to the blockchain, permanent and unalterable.",
+          "7. The transaction is completed."
+        ];
 
-const light=new THREE.PointLight(0x00ffff,2,50);
-light.position.set(0,5,5);
-scene.add(light);
-scene.add(new THREE.AmbientLight(0x4444ff,0.6));
+        const radius = 5;
+        const parent = document.querySelector("#blocks");
 
-const grid=new THREE.GridHelper(20,40,0x00ffff,0x004477);
-grid.position.y=-2;
-scene.add(grid);
+        stages.forEach((text, i) => {
+          const angle = (i / stages.length) * Math.PI * 2;
+          const x = Math.cos(angle) * radius;
+          const z = Math.sin(angle) * radius;
 
-const loader=new THREE.FontLoader();
-loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',font=>{
-  const titleGeo=new THREE.TextGeometry("How Blockchain Works",{font:font,size:0.5,height:0.05});
-  const titleMat=new THREE.MeshStandardMaterial({color:0x00ffff,emissive:0x0077ff});
-  const title=new THREE.Mesh(titleGeo,titleMat);
-  title.position.set(-3,3,-4);
-  scene.add(title);
+          const block = document.createElement("a-box");
+          block.setAttribute("color", "#00ffff");
+          block.setAttribute("emissive", "#0077ff");
+          block.setAttribute("depth", "1");
+          block.setAttribute("height", "1");
+          block.setAttribute("width", "1");
+          block.setAttribute("opacity", "0.8");
+          block.setAttribute("position", `${x} 1.6 ${z}`);
+          block.setAttribute("look-at", "#camera");
 
-  const stages=[
-    "1. Someone requests a transaction.",
-    "2. Broadcast to a peer-to-peer network.",
-    "3. Network validates using algorithms.",
-    "4. Verified transaction recorded.",
-    "5. Transactions combined into a block.",
-    "6. Block added to blockchain, permanent.",
-    "7. Transaction completed."
-  ];
+          const label = document.createElement("a-entity");
+          label.setAttribute(
+            "text",
+            `value:${text}; align:center; width:6; color:#ffffff`
+          );
+          label.setAttribute("position", `${x} 3 ${z}`);
+          label.setAttribute("look-at", "#camera");
 
-  const radius=6;
-  stages.forEach((t,i)=>{
-    const angle=(i/stages.length)*Math.PI*2;
-    const x=Math.cos(angle)*radius;
-    const z=Math.sin(angle)*radius;
-    const cube=new THREE.Mesh(
-      new THREE.BoxGeometry(1.2,1.2,1.2),
-      new THREE.MeshStandardMaterial({color:0x00ffff,emissive:0x004488,transparent:true,opacity:0.8})
-    );
-    cube.position.set(x,1.5,z);
-    cube.lookAt(0,1.5,0);
-    scene.add(cube);
+          parent.appendChild(block);
+          parent.appendChild(label);
+        });
+      </script>
 
-    const txtGeo=new THREE.TextGeometry(t,{font:font,size:0.18,height:0.01});
-    const txtMat=new THREE.MeshStandardMaterial({color:0xffffff,emissive:0x00ffff});
-    const txt=new THREE.Mesh(txtGeo,txtMat);
-    txt.position.set(x-2,0.5,z);
-    txt.lookAt(0,1.6,0);
-    scene.add(txt);
-  });
-});
+      <!-- arrows -->
+      <a-entity
+        text="value:← Look Left; color:#00ffff; align:center; width:4"
+        position="-3 1 -3"
+        look-at="#camera"
+      ></a-entity>
+      <a-entity
+        text="value:→ Look Right; color:#00ffff; align:center; width:4"
+        position="3 1 -3"
+        look-at="#camera"
+      ></a-entity>
+      <a-entity
+        text="value:↑ Look Up; color:#00ffff; align:center; width:4"
+        position="0 3 -3"
+        look-at="#camera"
+      ></a-entity>
+      <a-entity
+        text="value:↓ Look Down; color:#00ffff; align:center; width:4"
+        position="0 -1.5 -3"
+        look-at="#camera"
+      ></a-entity>
 
-function animate(){
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene,camera);
-}
-animate();
-
-window.addEventListener('resize',()=>{
-  camera.aspect=window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth,window.innerHeight);
-});
-</script>
-</body>
+      <!-- user camera -->
+      <a-entity id="camera" camera look-controls position="0 1.6 0"></a-entity>
+    </a-scene>
+  </body>
 </html>
