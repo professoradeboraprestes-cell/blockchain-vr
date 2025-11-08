@@ -2,186 +2,100 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>How Blockchain Works - VR 360°</title>
+<title>Blockchain Process - Interactive 3D</title>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 
-<!-- Three.js core and compatible addons -->
+<!-- Three.js core -->
 <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/controls/DeviceOrientationControls.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/loaders/FontLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/geometries/TextGeometry.js"></script>
 
 <style>
   html,body{margin:0;overflow:hidden;background:black;height:100%;width:100%}
-  #container{position:relative;width:100%;height:100%;}
-  canvas{display:block;}
-  .lens{
-    position:absolute;top:0;width:50%;height:100%;
-    overflow:hidden;border-radius:50%;
-  }
-  #left{left:0;}#right{right:0;}
-  .lens::after{
-    content:'';position:absolute;top:0;left:0;width:100%;height:100%;
-    box-shadow:inset 0 0 80px #000;border-radius:50%;pointer-events:none;
-  }
+  #info{position:absolute;top:10px;left:10px;color:#0ff;font-family:sans-serif;font-size:14px;}
 </style>
 </head>
 <body>
-<div id="container">
-  <div id="left" class="lens"></div>
-  <div id="right" class="lens"></div>
-</div>
-
+<div id="info">Touch and drag to look around</div>
 <script>
-/* -----  basic scene setup  ----- */
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x030514);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x02040a);
 
-const cameraL = new THREE.PerspectiveCamera(75, window.innerWidth/(2*window.innerHeight), 0.1, 1000);
-const cameraR = new THREE.PerspectiveCamera(75, window.innerWidth/(2*window.innerHeight), 0.1, 1000);
-cameraL.position.set(0,1.6,0);
-cameraR.position.set(0,1.6,0);
+const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+camera.position.set(0,1.6,5);
 
-const rendererL = new THREE.WebGLRenderer({antialias:true});
-const rendererR = new THREE.WebGLRenderer({antialias:true});
-rendererL.setSize(window.innerWidth/2, window.innerHeight);
-rendererR.setSize(window.innerWidth/2, window.innerHeight);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-document.getElementById("left").appendChild(rendererL.domElement);
-document.getElementById("right").appendChild(rendererR.domElement);
+const controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+controls.dampingFactor=0.05;
+controls.enablePan=false;
+controls.minDistance=3;
+controls.maxDistance=8;
 
-const controls = new THREE.DeviceOrientationControls(cameraL);
-const controlsR = new THREE.DeviceOrientationControls(cameraR);
-
-const light = new THREE.PointLight(0x00ffff, 2, 50);
+const light=new THREE.PointLight(0x00ffff,2,50);
 light.position.set(0,5,5);
 scene.add(light);
+scene.add(new THREE.AmbientLight(0x4444ff,0.6));
 
-const ambient = new THREE.AmbientLight(0x6666ff,0.6);
-scene.add(ambient);
-
-/* -----  neon grid floor  ----- */
-const grid = new THREE.GridHelper(20, 40, 0x00ffff, 0x004477);
-grid.position.y = -2;
+const grid=new THREE.GridHelper(20,40,0x00ffff,0x004477);
+grid.position.y=-2;
 scene.add(grid);
 
-/* -----  title text  ----- */
-const loader = new THREE.FontLoader();
-let titleMesh;
-loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function(font){
-  const geo = new THREE.TextGeometry("How Blockchain Works", {
-    font: font, size: 0.5, height: 0.1,
-  });
-  const mat = new THREE.MeshStandardMaterial({color:0x00ffff, emissive:0x0077ff, emissiveIntensity:0.8});
-  titleMesh = new THREE.Mesh(geo, mat);
-  titleMesh.position.set(-4,3,-5);
-  scene.add(titleMesh);
-});
+const loader=new THREE.FontLoader();
+loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',font=>{
+  const titleGeo=new THREE.TextGeometry("How Blockchain Works",{font:font,size:0.5,height:0.05});
+  const titleMat=new THREE.MeshStandardMaterial({color:0x00ffff,emissive:0x0077ff});
+  const title=new THREE.Mesh(titleGeo,titleMat);
+  title.position.set(-3,3,-4);
+  scene.add(title);
 
-/* -----  prepare group for blocks  ----- */
-const blocks = new THREE.Group();
-scene.add(blocks);
+  const stages=[
+    "1. Someone requests a transaction.",
+    "2. Broadcast to a peer-to-peer network.",
+    "3. Network validates using algorithms.",
+    "4. Verified transaction recorded.",
+    "5. Transactions combined into a block.",
+    "6. Block added to blockchain, permanent.",
+    "7. Transaction completed."
+  ];
 
-/* -----  7 blockchain stages  ----- */
-const stages = [
- {n:1, text:"Someone requests a transaction."},
- {n:2, text:"The transaction is broadcast to a peer-to-peer network of computers (nodes)."},
- {n:3, text:"The network validates the transaction and user status using known algorithms."},
- {n:4, text:"A verified transaction may involve cryptocurrency, contracts, or records."},
- {n:5, text:"Once verified, the transaction is combined with others to create a new block."},
- {n:6, text:"The new block is added to the existing blockchain, permanent and unalterable."},
- {n:7, text:"The transaction is completed."}
-];
-
-loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', font=>{
-  const radius = 6;
-  stages.forEach((s,i)=>{
-    const angle = (i/stages.length)*Math.PI*2;
-    const x = Math.cos(angle)*radius;
-    const z = Math.sin(angle)*radius;
-
-    const mat = new THREE.MeshStandardMaterial({color:0x00ffff,emissive:0x0088ff,emissiveIntensity:0.5,transparent:true,opacity:0.8});
-    const cube = new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2,1.2),mat);
+  const radius=6;
+  stages.forEach((t,i)=>{
+    const angle=(i/stages.length)*Math.PI*2;
+    const x=Math.cos(angle)*radius;
+    const z=Math.sin(angle)*radius;
+    const cube=new THREE.Mesh(
+      new THREE.BoxGeometry(1.2,1.2,1.2),
+      new THREE.MeshStandardMaterial({color:0x00ffff,emissive:0x004488,transparent:true,opacity:0.8})
+    );
     cube.position.set(x,1.5,z);
     cube.lookAt(0,1.5,0);
+    scene.add(cube);
 
-    const numGeo = new THREE.TextGeometry(s.n.toString(),{font:font,size:0.7,height:0.05});
-    const numMat = new THREE.MeshStandardMaterial({color:0xffffff,emissive:0x00ffff});
-    const num = new THREE.Mesh(numGeo,numMat);
-    num.position.set(x-0.3,2.5,z);
-    num.lookAt(0,2.5,0);
-    scene.add(num);
-
-    const textGeo = new THREE.TextGeometry(s.text,{font:font,size:0.18,height:0.01});
-    const textMat = new THREE.MeshStandardMaterial({color:0xffffff,emissive:0x00ffff});
-    const txt = new THREE.Mesh(textGeo,textMat);
+    const txtGeo=new THREE.TextGeometry(t,{font:font,size:0.18,height:0.01});
+    const txtMat=new THREE.MeshStandardMaterial({color:0xffffff,emissive:0x00ffff});
+    const txt=new THREE.Mesh(txtGeo,txtMat);
     txt.position.set(x-2,0.5,z);
     txt.lookAt(0,1.6,0);
-    txt.visible=false;
-
-    cube.userData={textMesh:txt,visible:false};
-    scene.add(cube);
     scene.add(txt);
-    blocks.add(cube);
   });
 });
 
-/* -----  directional arrows  ----- */
-function makeArrow(text,pos){
-  loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',font=>{
-    const geo=new THREE.TextGeometry(text,{font:font,size:0.25,height:0.02});
-    const mat=new THREE.MeshStandardMaterial({color:0x00ffff,emissive:0x0077ff});
-    const mesh=new THREE.Mesh(geo,mat);
-    mesh.position.copy(pos);
-    scene.add(mesh);
-  });
-}
-makeArrow("← Look Left",new THREE.Vector3(-3,0.5,-3));
-makeArrow("→ Look Right",new THREE.Vector3(3,0.5,-3));
-makeArrow("↑ Look Up",new THREE.Vector3(0,3,-3));
-makeArrow("↓ Look Down",new THREE.Vector3(0,-2,-3));
-
-/* -----  focus detection  ----- */
-let raycaster=new THREE.Raycaster();
-let focusObj=null;
-let focusTimer=null;
-
-function checkFocus(){
-  raycaster.setFromCamera(new THREE.Vector2(0,0),cameraL);
-  const intersects=raycaster.intersectObjects(blocks.children);
-  if(intersects.length>0){
-    if(focusObj!==intersects[0].object){
-      focusObj=intersects[0].object;
-      if(focusTimer){clearTimeout(focusTimer);}
-      focusTimer=setTimeout(()=>{
-        const t=focusObj.userData.textMesh;
-        t.visible=true;
-      },3000);
-    }
-  } else {
-    focusObj=null;
-  }
-}
-
-/* -----  animation loop  ----- */
 function animate(){
   requestAnimationFrame(animate);
   controls.update();
-  controlsR.update();
-  checkFocus();
-  rendererL.render(scene,cameraL);
-  rendererR.render(scene,cameraR);
+  renderer.render(scene,camera);
 }
 animate();
 
-/* -----  responsive resize  ----- */
 window.addEventListener('resize',()=>{
-  cameraL.aspect=window.innerWidth/(2*window.innerHeight);
-  cameraL.updateProjectionMatrix();
-  cameraR.aspect=window.innerWidth/(2*window.innerHeight);
-  cameraR.updateProjectionMatrix();
-  rendererL.setSize(window.innerWidth/2,window.innerHeight);
-  rendererR.setSize(window.innerWidth/2,window.innerHeight);
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
 });
 </script>
 </body>
