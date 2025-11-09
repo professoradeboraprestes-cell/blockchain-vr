@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/controls/DeviceOrientationControls.js"></script>
 <style>
   html,body {margin:0;overflow:hidden;background:#050514;height:100%;width:100%;}
   #msg{position:fixed;top:10px;left:10px;color:cyan;font-family:sans-serif;}
@@ -19,35 +18,26 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x050514);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.set(0,1.6,0);
+camera.position.set(0,1.6,8);
 
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(window.innerWidth,window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-/* Detecta tipo de controle: celular ou notebook */
-let controls;
-if (window.DeviceOrientationEvent) {
-  controls = new THREE.DeviceOrientationControls(camera);
-} else {
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.05;
-  controls.rotateSpeed = 0.6;
-}
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.rotateSpeed = 0.6;
 
-/* Luzes */
 const light = new THREE.PointLight(0x00ffff,2,50);
 light.position.set(0,5,5);
 scene.add(light);
 scene.add(new THREE.AmbientLight(0x6666ff,0.5));
 
-/* Chão gradeado */
 const grid = new THREE.GridHelper(20,40,0x00ffff,0x004477);
 grid.position.y=-2;
 scene.add(grid);
 
-/* Título */
 const titleCanvas = document.createElement('canvas');
 titleCanvas.width = 1024; titleCanvas.height = 128;
 const tctx = titleCanvas.getContext('2d');
@@ -57,10 +47,9 @@ tctx.fillText('HOW BLOCKCHAIN WORKS', 60, 80);
 const titleTex = new THREE.CanvasTexture(titleCanvas);
 const titleMat = new THREE.MeshBasicMaterial({map:titleTex, transparent:true});
 const titleMesh = new THREE.Mesh(new THREE.PlaneGeometry(8,1.5), titleMat);
-titleMesh.position.set(0,3,-8);
+titleMesh.position.set(0,3,0);
 scene.add(titleMesh);
 
-/* Etapas */
 const stages = [
  "1. Someone requests a transaction.",
  "2. The transaction is broadcast to a peer-to-peer network of computers (nodes).",
@@ -79,7 +68,7 @@ const material = new THREE.MeshStandardMaterial({
   opacity:0.8
 });
 
-const radius = 9; // espaçamento aumentado
+const radius = 9;
 for(let i=0;i<stages.length;i++){
   const angle = (i/stages.length)*Math.PI*2;
   const x = Math.cos(angle)*radius;
@@ -104,7 +93,6 @@ for(let i=0;i<stages.length;i++){
   scene.add(textMesh);
 }
 
-/* Função para quebra de linha automática */
 function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   const words = text.split(' ');
   let line = '';
@@ -123,7 +111,6 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   ctx.fillText(line, x, y);
 }
 
-/* Animação */
 function animate(){
   requestAnimationFrame(animate);
   controls.update();
@@ -131,7 +118,6 @@ function animate(){
 }
 animate();
 
-/* Resize */
 window.addEventListener('resize',()=>{
   camera.aspect=window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
