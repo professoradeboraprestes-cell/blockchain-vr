@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Blockchain Cardboard VR 3D</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <style>
+    body { margin: 0; background: #050514; }
+    .a-enter-vr-button {
+      background-color: #00ffff !important;
+      color: #000 !important;
+      border: none !important;
+    }
+  </style>
+</head>
+<body>
+  <a-scene vr-mode-ui="enabled: true" device-orientation-permission-ui="enabled: true">
+    <!-- background and lighting -->
+    <a-sky color="#050514"></a-sky>
+    <a-entity light="type: ambient; color: #00ffff; intensity: 0.9"></a-entity>
+    <a-entity light="type: point; color: #00ffff; intensity: 2; distance: 50" position="0 5 5"></a-entity>
+
+    <!-- camera with attached floating title -->
+    <a-entity id="camera" camera look-controls position="0 1.6 0">
+      <a-entity position="0 0.8 -2">
+        <a-text 
+          value="HOW BLOCKCHAIN WORKS"
+          color="#00ffff"
+          align="center"
+          width="8"
+          wrap-count="30"
+          shader="flat"
+          side="double">
+        </a-text>
+      </a-entity>
+    </a-entity>
+
+    <!-- floor grid -->
+    <a-plane rotation="-90 0 0" width="50" height="50"
+             material="wireframe:true; color:#0077ff; opacity:0.4"></a-plane>
+
+    <script>
+      const steps = [
+        "1. Someone requests a transaction.",
+        "2. The transaction is broadcast to a peer-to-peer network of computers (nodes).",
+        "3. The network validates the transaction and the user's status using algorithms.",
+        "4. A verified transaction may involve cryptocurrency, contracts, or records.",
+        "5. Once verified, the transaction is combined with others to create a new block.",
+        "6. The new block is added to the existing blockchain, permanent and unalterable.",
+        "7. The transaction is completed."
+      ];
+
+      const scene = document.querySelector("a-scene").object3D;
+      const radius = 8;
+
+      steps.forEach((text, i) => {
+        const angle = (i / steps.length) * Math.PI * 2;
+        const x = Math.cos(angle) * radius;
+        const z = Math.sin(angle) * radius;
+        const yText = (i % 2 === 0) ? 3.8 : 2.8;
+        const yBlock = (i % 2 === 0) ? 1.6 : 1.2;
+
+        // glowing block
+        const block = new THREE.Mesh(
+          new THREE.BoxGeometry(1.2, 1.2, 1.2),
+          new THREE.MeshPhongMaterial({
+            color: 0x0077ff,
+            transparent: true,
+            opacity: 0.8,
+            emissive: 0x00ffff,
+            emissiveIntensity: 0.8
+          })
+        );
+        block.position.set(x, yBlock, z);
+        block.lookAt(0, 1.5, 0);
+        scene.add(block);
+
+        // text plane
+        const canvas = document.createElement("canvas");
+        canvas.width = 2048;
+        canvas.height = 512;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#050514";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = "bold 42px Arial";
+        ctx.fillStyle = "#00ffff";
+        ctx.textAlign = "center";
+        let line = "", y = 160, lineHeight = 50;
+        const words = text.split(" ");
+        for (let n = 0; n < words.length; n++) {
+          const test = line + words[n] + " ";
+          if (ctx.measureText(test).width > 1800 && n > 0) {
+            ctx.fillText(line, canvas.width / 2, y);
+            line = words[n] + " ";
+            y += lineHeight;
+          } else line = test;
+        }
+        ctx.fillText(line, canvas.width / 2, y);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        const mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+        const plane = new THREE.Mesh(new THREE.PlaneGeometry(7, 1.8), mat);
+        plane.position.set(x, yText, z);
+        plane.lookAt(0, 1.5, 0);
+        scene.add(plane);
+      });
+    </script>
+  </a-scene>
+</body>
+</html>
