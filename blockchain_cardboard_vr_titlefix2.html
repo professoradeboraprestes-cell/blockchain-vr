@@ -16,19 +16,19 @@
 </head>
 <body>
   <a-scene vr-mode-ui="enabled: true" device-orientation-permission-ui="enabled: true">
-    <!-- background and lighting -->
+    <!-- background and lights -->
     <a-sky color="#050514"></a-sky>
     <a-entity light="type: ambient; color: #00ffff; intensity: 0.9"></a-entity>
     <a-entity light="type: point; color: #00ffff; intensity: 2; distance: 50" position="0 5 5"></a-entity>
 
-    <!-- camera with attached floating title -->
+    <!-- camera + floating title -->
     <a-entity id="camera" camera look-controls position="0 1.6 0">
       <a-entity position="0 0.8 -2">
         <a-text 
           value="HOW BLOCKCHAIN WORKS"
           color="#00ffff"
           align="center"
-          width="8"
+          width="10"
           wrap-count="30"
           shader="flat"
           side="double">
