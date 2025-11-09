@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Blockchain 360° Interactive</title>
+  <title>Blockchain 360° VR Interactive</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <style>
@@ -11,7 +11,7 @@
 </head>
 <body>
   <a-scene>
-    <!-- Background and lights -->
+    <!-- Background and lighting -->
     <a-sky color="#050514"></a-sky>
     <a-entity light="type: ambient; color: #00ffff; intensity: 0.9"></a-entity>
     <a-entity light="type: point; color: #00ffff; intensity: 2; distance: 50" position="0 5 5"></a-entity>
@@ -26,9 +26,15 @@
     <!-- Blocks container -->
     <a-entity id="blocks"></a-entity>
 
-    <!-- Camera rig (auto rotation) -->
-    <a-entity id="rig" rotation="0 0 0">
-      <a-entity camera look-controls position="0 1.6 0"></a-entity>
+    <!-- Arrows fixed to camera -->
+    <a-entity id="hud" position="0 0 -2">
+      <a-text value="◄ LOOK LEFT" color="#00ffff" align="center" width="4" position="-2 -1.5 0"></a-text>
+      <a-text value="LOOK RIGHT ►" color="#00ffff" align="center" width="4" position="2 -1.5 0"></a-text>
+    </a-entity>
+
+    <!-- Camera (head/mouse control) -->
+    <a-entity camera look-controls position="0 1.6 0">
+      <a-entity id="hudRef" position="0 0 -1"></a-entity>
     </a-entity>
 
     <script>
@@ -42,7 +48,7 @@
         "7. The transaction is completed."
       ];
 
-      // create title
+      // Title using canvas
       const titleCanvas = document.createElement("canvas");
       titleCanvas.width = 2048;
       titleCanvas.height = 256;
@@ -59,7 +65,7 @@
       titlePlane.position.set(0, 3.5, -5);
       document.querySelector("a-scene").object3D.add(titlePlane);
 
-      // create blocks + texts
+      // Blocks and texts
       const scene = document.querySelector("a-scene").object3D;
       const radius = 6;
 
@@ -68,7 +74,7 @@
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
 
-        // glowing block
+        // Glowing block
         const block = new THREE.Mesh(
           new THREE.BoxGeometry(1, 1, 1),
           new THREE.MeshPhongMaterial({
@@ -83,7 +89,7 @@
         block.lookAt(0, 0, 0);
         scene.add(block);
 
-        // text via canvas
+        // Text via canvas
         const canvas = document.createElement("canvas");
         canvas.width = 2048;
         canvas.height = 512;
@@ -113,15 +119,11 @@
         plane.lookAt(0, 1.5, 0);
         scene.add(plane);
       });
-
-      // automatic rotation
-      const rig = document.querySelector("#rig").object3D;
-      function animate() {
-        requestAnimationFrame(animate);
-        rig.rotation.y += 0.0015; // slow rotation
-      }
-      animate();
     </script>
   </a-scene>
 </body>
+</html>
+  </a-scene>
+</body>
+
 </html>
