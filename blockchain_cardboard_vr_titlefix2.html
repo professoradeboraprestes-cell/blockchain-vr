@@ -2,44 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Blockchain Cardboard VR 3D</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <title>Blockchain Cardboard VR 3D - Matrix Mode</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <style>
-    body { margin: 0; background: #050514; }
+    body { margin: 0; background: #000; }
     .a-enter-vr-button {
-      background-color: #00ffff !important;
+      background-color: #00ff99 !important;
       color: #000 !important;
       border: none !important;
+      font-weight: bold !important;
     }
   </style>
 </head>
 <body>
   <a-scene vr-mode-ui="enabled: true" device-orientation-permission-ui="enabled: true">
-    <!-- background and lights -->
-    <a-sky color="#050514"></a-sky>
-    <a-entity light="type: ambient; color: #00ffff; intensity: 0.9"></a-entity>
+    <!-- background matrix -->
+    <a-assets>
+      <canvas id="matrixCanvas" width="1024" height="1024"></canvas>
+    </a-assets>
+    <a-sky id="matrixSky" src="#matrixCanvas" rotation="0 0 0"></a-sky>
+
+    <!-- lights -->
+    <a-entity light="type: ambient; color: #00ffff; intensity: 1"></a-entity>
     <a-entity light="type: point; color: #00ffff; intensity: 2; distance: 50" position="0 5 5"></a-entity>
 
-    <!-- camera + floating title -->
-    <a-entity id="camera" camera look-controls position="0 1.6 0">
-      <a-entity position="0 0.8 -2">
-        <a-text 
-          value="HOW BLOCKCHAIN WORKS"
-          color="#00ffff"
-          align="center"
-          width="10"
-          wrap-count="30"
-          shader="flat"
-          side="double">
-        </a-text>
-      </a-entity>
+    <!-- floor -->
+    <a-plane rotation="-90 0 0" width="50" height="50" material="wireframe:true; color:#0077ff; opacity:0.4"></a-plane>
+
+    <!-- camera + title -->
+    <a-entity id="cameraRig" position="0 1.6 0">
+      <a-entity camera look-controls></a-entity>
+      <a-text
+        value="HOW BLOCKCHAIN\nWORKS"
+        position="0 1.4 -3"
+        width="7"
+        align="center"
+        color="#00ffff"
+        font="https://cdn.aframe.io/fonts/Exo2Bold-msdf.json"
+        shader="msdf"
+        negate="false">
+      </a-text>
     </a-entity>
 
-    <!-- floor grid -->
-    <a-plane rotation="-90 0 0" width="50" height="50"
-             material="wireframe:true; color:#0077ff; opacity:0.4"></a-plane>
-
+    <!-- blocks + text -->
     <script>
       const steps = [
         "1. Someone requests a transaction.",
@@ -58,53 +64,79 @@
         const angle = (i / steps.length) * Math.PI * 2;
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
-        const yText = (i % 2 === 0) ? 3.8 : 2.8;
-        const yBlock = (i % 2 === 0) ? 1.6 : 1.2;
+        const yBlock = (i % 2 === 0) ? 1.4 : 1.0;
+        const yText = (i % 2 === 0) ? 3.0 : 2.2;
 
-        // glowing block
+        // block
         const block = new THREE.Mesh(
-          new THREE.BoxGeometry(1.2, 1.2, 1.2),
+          new THREE.BoxGeometry(1, 1, 1),
           new THREE.MeshPhongMaterial({
             color: 0x0077ff,
-            transparent: true,
-            opacity: 0.8,
             emissive: 0x00ffff,
-            emissiveIntensity: 0.8
+            emissiveIntensity: 0.8,
+            transparent: true,
+            opacity: 0.8
           })
         );
         block.position.set(x, yBlock, z);
-        block.lookAt(0, 1.5, 0);
+        block.lookAt(0, 1.6, 0);
         scene.add(block);
 
-        // text plane
+        // text
         const canvas = document.createElement("canvas");
-        canvas.width = 2048;
-        canvas.height = 512;
+        canvas.width = 1024;
+        canvas.height = 256;
         const ctx = canvas.getContext("2d");
-        ctx.fillStyle = "#050514";
+        ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.font = "bold 42px Arial";
+        ctx.font = "bold 40px Arial";
         ctx.fillStyle = "#00ffff";
         ctx.textAlign = "center";
-        let line = "", y = 160, lineHeight = 50;
+        ctx.textBaseline = "middle";
         const words = text.split(" ");
+        let line = "", y = 110, lineHeight = 46;
         for (let n = 0; n < words.length; n++) {
           const test = line + words[n] + " ";
-          if (ctx.measureText(test).width > 1800 && n > 0) {
+          if (ctx.measureText(test).width > 900 && n > 0) {
             ctx.fillText(line, canvas.width / 2, y);
             line = words[n] + " ";
             y += lineHeight;
           } else line = test;
         }
         ctx.fillText(line, canvas.width / 2, y);
-
         const texture = new THREE.CanvasTexture(canvas);
         const mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
-        const plane = new THREE.Mesh(new THREE.PlaneGeometry(7, 1.8), mat);
+        const plane = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), mat);
         plane.position.set(x, yText, z);
-        plane.lookAt(0, 1.5, 0);
+        plane.lookAt(0, 1.6, 0);
         scene.add(plane);
       });
+
+      // MATRIX animation background
+      const matrixCanvas = document.getElementById("matrixCanvas");
+      const mctx = matrixCanvas.getContext("2d");
+      const letters = "01";
+      const fontSize = 14;
+      const columns = matrixCanvas.width / fontSize;
+      const drops = Array(Math.floor(columns)).fill(1);
+
+      function drawMatrix() {
+        mctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        mctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+        mctx.fillStyle = "#0F0";
+        mctx.font = fontSize + "px monospace";
+        for (let i = 0; i < drops.length; i++) {
+          const text = letters.charAt(Math.floor(Math.random() * letters.length));
+          mctx.fillText(text, i * fontSize, drops[i] * fontSize);
+          if (drops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975) drops[i] = 0;
+          drops[i]++;
+        }
+        const tex = new THREE.CanvasTexture(matrixCanvas);
+        const sky = document.querySelector("#matrixSky").getObject3D("mesh");
+        if (sky && sky.material) sky.material.map = tex;
+        requestAnimationFrame(drawMatrix);
+      }
+      drawMatrix();
     </script>
   </a-scene>
 </body>
