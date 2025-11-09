@@ -2,126 +2,105 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>How Blockchain Works - VR</title>
+<title>How Blockchain Works - 360°</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r158/examples/js/controls/OrbitControls.js"></script>
+<script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
 <style>
-  html,body {margin:0;overflow:hidden;background:#050514;height:100%;width:100%;}
-  #msg{position:fixed;top:10px;left:10px;color:cyan;font-family:sans-serif;}
+  html, body {margin:0;overflow:hidden;background:#050514;height:100%;width:100%;}
+  #msg {position:fixed;top:10px;left:10px;color:cyan;font-family:sans-serif;}
 </style>
 </head>
 <body>
 <div id="msg">HOW BLOCKCHAIN WORKS - 360° VIEW</div>
 <script>
+// cena
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x050514);
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.set(0,1.6,8);
+// câmera
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 2, 15);
 
+// renderizador
 const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+// controles
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.rotateSpeed = 0.6;
+controls.enablePan = false;
 
-const light = new THREE.PointLight(0x00ffff,2,50);
-light.position.set(0,5,5);
+// luz
+const light = new THREE.PointLight(0x00ffff, 2, 100);
+light.position.set(0, 5, 10);
 scene.add(light);
-scene.add(new THREE.AmbientLight(0x6666ff,0.5));
+scene.add(new THREE.AmbientLight(0x5555ff, 0.6));
 
-const grid = new THREE.GridHelper(20,40,0x00ffff,0x004477);
-grid.position.y=-2;
-scene.add(grid);
+// título
+function makeTextPlane(text, size, color="#00ffff") {
+  const c = document.createElement('canvas');
+  const ctx = c.getContext('2d');
+  c.width = 1024; c.height = 256;
+  ctx.fillStyle = color;
+  ctx.font = `${size}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.fillText(text, 512, 150);
+  const tex = new THREE.CanvasTexture(c);
+  const mat = new THREE.MeshBasicMaterial({map:tex, transparent:true});
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(10, 2), mat);
+  return mesh;
+}
+const title = makeTextPlane("HOW BLOCKCHAIN WORKS", 70);
+title.position.set(0, 5, 0);
+scene.add(title);
 
-const titleCanvas = document.createElement('canvas');
-titleCanvas.width = 1024; titleCanvas.height = 128;
-const tctx = titleCanvas.getContext('2d');
-tctx.font = 'bold 50px Arial';
-tctx.fillStyle = '#00ffff';
-tctx.fillText('HOW BLOCKCHAIN WORKS', 60, 80);
-const titleTex = new THREE.CanvasTexture(titleCanvas);
-const titleMat = new THREE.MeshBasicMaterial({map:titleTex, transparent:true});
-const titleMesh = new THREE.Mesh(new THREE.PlaneGeometry(8,1.5), titleMat);
-titleMesh.position.set(0,3,0);
-scene.add(titleMesh);
-
+// etapas
 const stages = [
- "1. Someone requests a transaction.",
- "2. The transaction is broadcast to a peer-to-peer network of computers (nodes).",
- "3. The network validates the transaction and the user’s status using algorithms.",
- "4. A verified transaction may involve cryptocurrency, contracts, or records.",
- "5. Once verified, the transaction is combined with others to create a new block.",
- "6. The new block is added to the existing blockchain, permanent and unalterable.",
- "7. The transaction is completed."
+  "1. Someone requests a transaction.",
+  "2. The transaction is broadcast to the network.",
+  "3. The network validates the transaction.",
+  "4. A verified transaction may involve cryptocurrency or records.",
+  "5. The verified transaction is combined into a new block.",
+  "6. The new block is added to the blockchain permanently.",
+  "7. The transaction is completed."
 ];
 
-const material = new THREE.MeshStandardMaterial({
-  color:0x00ffff,
-  emissive:0x0088ff,
-  emissiveIntensity:0.6,
-  transparent:true,
-  opacity:0.8
-});
+// blocos e textos
+const mat = new THREE.MeshStandardMaterial({color:0x00ffff, emissive:0x0088ff});
+const radius = 10;
 
-const radius = 9;
-for(let i=0;i<stages.length;i++){
-  const angle = (i/stages.length)*Math.PI*2;
-  const x = Math.cos(angle)*radius;
-  const z = Math.sin(angle)*radius;
+for (let i=0;i<stages.length;i++) {
+  const angle = (i / stages.length) * Math.PI * 2;
+  const x = Math.cos(angle) * radius;
+  const z = Math.sin(angle) * radius;
 
-  const cube = new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2,1.2), material.clone());
-  cube.position.set(x,1.6,z);
-  cube.lookAt(0,1.6,0);
+  const cube = new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2,1.2), mat);
+  cube.position.set(x, 1.5, z);
+  cube.lookAt(0, 1.5, 0);
   scene.add(cube);
 
-  const textCanvas = document.createElement('canvas');
-  textCanvas.width = 1024; textCanvas.height = 256;
-  const ctx = textCanvas.getContext('2d');
-  ctx.font = '32px Arial';
-  ctx.fillStyle = 'white';
-  wrapText(ctx, stages[i], 20, 80, 960, 40);
-  const textTex = new THREE.CanvasTexture(textCanvas);
-  const textMat = new THREE.MeshBasicMaterial({map:textTex,transparent:true});
-  const textMesh = new THREE.Mesh(new THREE.PlaneGeometry(6,1.5), textMat);
-  textMesh.position.set(x-2,0.4,z);
-  textMesh.lookAt(0,1.6,0);
-  scene.add(textMesh);
+  const text = makeTextPlane(stages[i], 36, "white");
+  text.position.set(x, 0.3, z);
+  text.lookAt(0, 1.5, 0);
+  scene.add(text);
 }
 
-function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-  const words = text.split(' ');
-  let line = '';
-  for(let n = 0; n < words.length; n++) {
-    const testLine = line + words[n] + ' ';
-    const metrics = ctx.measureText(testLine);
-    const testWidth = metrics.width;
-    if (testWidth > maxWidth && n > 0) {
-      ctx.fillText(line, x, y);
-      line = words[n] + ' ';
-      y += lineHeight;
-    } else {
-      line = testLine;
-    }
-  }
-  ctx.fillText(line, x, y);
-}
-
-function animate(){
+// animação
+function animate() {
   requestAnimationFrame(animate);
   controls.update();
-  renderer.render(scene,camera);
+  renderer.render(scene, camera);
 }
 animate();
 
-window.addEventListener('resize',()=>{
-  camera.aspect=window.innerWidth/window.innerHeight;
+// redimensionar
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth,window.innerHeight);
+  renderer.setSize(window.innerWidth, window.innerHeight);
 });
 </script>
 </body>
