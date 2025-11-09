@@ -2,92 +2,102 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Blockchain Cardboard Split View</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <title>Blockchain VR Split (Cardboard)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <style>
-    body { margin: 0; background: #000; display: flex; }
-    iframe { width: 50vw; height: 100vh; border: none; }
+    body { margin: 0; background: #000; overflow: hidden; }
+    canvas { width: 50vw; height: 100vh; }
+    #left, #right {
+      position: absolute; top: 0; width: 50%; height: 100%;
+      overflow: hidden;
+    }
+    #left { left: 0; }
+    #right { right: 0; }
   </style>
 </head>
 <body>
-  <iframe srcdoc='
-  <a-scene embedded background="color: #050514">
-    <a-sky color="#050514"></a-sky>
-    <a-entity light="type: ambient; color: #00ffff; intensity: 0.9"></a-entity>
-    <a-entity light="type: point; color: #00ffff; intensity: 2; distance: 50" position="0 5 5"></a-entity>
-    <a-text value="HOW BLOCKCHAIN WORKS" color="#00ffff" align="center" width="12" position="0 4 -6"></a-text>
-    <a-plane rotation="-90 0 0" width="50" height="50" material="wireframe:true; color:#0077ff; opacity:0.4"></a-plane>
-    <a-entity camera look-controls position="0 1.6 0"></a-entity>
-    <script>
-      const steps=["1. Someone requests a transaction.","2. The transaction is broadcast to a peer-to-peer network of computers (nodes).","3. The network validates the transaction and the user's status using algorithms.","4. A verified transaction may involve cryptocurrency, contracts, or records.","5. Once verified, the transaction is combined with others to create a new block.","6. The new block is added to the existing blockchain, permanent and unalterable.","7. The transaction is completed."];
-      const scene=document.querySelector("a-scene").object3D;
-      const radius=8;
-      steps.forEach((text,i)=>{
-        const angle=(i/steps.length)*Math.PI*2;
-        const x=Math.cos(angle)*radius;
-        const z=Math.sin(angle)*radius;
-        const yText=(i%2===0)?3.8:2.8;
-        const yBlock=(i%2===0)?1.6:1.2;
-        const block=new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2,1.2),
-          new THREE.MeshPhongMaterial({color:0x0077ff,transparent:true,opacity:0.8,emissive:0x00ffff,emissiveIntensity:0.8}));
-        block.position.set(x,yBlock,z);
-        block.lookAt(0,1.5,0);
-        scene.add(block);
-        const c=document.createElement("canvas");c.width=2048;c.height=512;
-        const ctx=c.getContext("2d");ctx.fillStyle="#050514";ctx.fillRect(0,0,c.width,c.height);
-        ctx.font="34px Arial";ctx.fillStyle="#00ffff";ctx.textAlign="center";
-        let line="",y=160,lineHeight=44;const words=text.split(" ");
-        for(let n=0;n<words.length;n++){const t=line+words[n]+" ";if(ctx.measureText(t).width>1800&&n>0){ctx.fillText(line,c.width/2,y);line=words[n]+" ";y+=lineHeight;}else line=t;}
-        ctx.fillText(line,c.width/2,y);
-        const tex=new THREE.CanvasTexture(c);
-        const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true});
-        const plane=new THREE.Mesh(new THREE.PlaneGeometry(7,1.8),mat);
-        plane.position.set(x,yText,z);
-        plane.lookAt(0,1.5,0);
-        scene.add(plane);
-      });
-    </script>
-  </a-scene>'></iframe>
+  <div id="left">
+    <a-scene id="sceneL" embedded background="color: #050514">
+      <a-sky color="#050514"></a-sky>
+      <a-entity light="type: ambient; color: #00ffff; intensity: 0.9"></a-entity>
+      <a-entity light="type: point; color: #00ffff; intensity: 2" position="0 5 5"></a-entity>
+      <a-text value="HOW BLOCKCHAIN WORKS" color="#00ffff" align="center" width="12" position="0 4 -6"></a-text>
+      <a-plane rotation="-90 0 0" width="50" height="50" material="wireframe:true; color:#0077ff; opacity:0.4"></a-plane>
+      <a-entity id="cameraL" camera look-controls position="-0.03 1.6 0"></a-entity>
+      <a-entity id="blocksL"></a-entity>
+    </a-scene>
+  </div>
 
-  <!-- duplicate view for right eye -->
-  <iframe srcdoc='
-  <a-scene embedded background="color: #050514">
-    <a-sky color="#050514"></a-sky>
-    <a-entity light="type: ambient; color: #00ffff; intensity: 0.9"></a-entity>
-    <a-entity light="type: point; color: #00ffff; intensity: 2; distance: 50" position="0 5 5"></a-entity>
-    <a-text value="HOW BLOCKCHAIN WORKS" color="#00ffff" align="center" width="12" position="0 4 -6"></a-text>
-    <a-plane rotation="-90 0 0" width="50" height="50" material="wireframe:true; color:#0077ff; opacity:0.4"></a-plane>
-    <a-entity camera look-controls position="0 1.6 0"></a-entity>
-    <script>
-      const steps=["1. Someone requests a transaction.","2. The transaction is broadcast to a peer-to-peer network of computers (nodes).","3. The network validates the transaction and the user's status using algorithms.","4. A verified transaction may involve cryptocurrency, contracts, or records.","5. Once verified, the transaction is combined with others to create a new block.","6. The new block is added to the existing blockchain, permanent and unalterable.","7. The transaction is completed."];
-      const scene=document.querySelector("a-scene").object3D;
-      const radius=8;
-      steps.forEach((text,i)=>{
-        const angle=(i/steps.length)*Math.PI*2;
-        const x=Math.cos(angle)*radius;
-        const z=Math.sin(angle)*radius;
-        const yText=(i%2===0)?3.8:2.8;
-        const yBlock=(i%2===0)?1.6:1.2;
-        const block=new THREE.Mesh(new THREE.BoxGeometry(1.2,1.2,1.2),
-          new THREE.MeshPhongMaterial({color:0x0077ff,transparent:true,opacity:0.8,emissive:0x00ffff,emissiveIntensity:0.8}));
-        block.position.set(x,yBlock,z);
-        block.lookAt(0,1.5,0);
+  <div id="right">
+    <a-scene id="sceneR" embedded background="color: #050514">
+      <a-sky color="#050514"></a-sky>
+      <a-entity light="type: ambient; color: #00ffff; intensity: 0.9"></a-entity>
+      <a-entity light="type: point; color: #00ffff; intensity: 2" position="0 5 5"></a-entity>
+      <a-text value="HOW BLOCKCHAIN WORKS" color="#00ffff" align="center" width="12" position="0 4 -6"></a-text>
+      <a-plane rotation="-90 0 0" width="50" height="50" material="wireframe:true; color:#0077ff; opacity:0.4"></a-plane>
+      <a-entity id="cameraR" camera look-controls position="0.03 1.6 0"></a-entity>
+      <a-entity id="blocksR"></a-entity>
+    </a-scene>
+  </div>
+
+  <script>
+    const steps = [
+      "1. Someone requests a transaction.",
+      "2. The transaction is broadcast to a peer-to-peer network of computers (nodes).",
+      "3. The network validates the transaction and the user's status using algorithms.",
+      "4. A verified transaction may involve cryptocurrency, contracts, or records.",
+      "5. Once verified, the transaction is combined with others to create a new block.",
+      "6. The new block is added to the existing blockchain, permanent and unalterable.",
+      "7. The transaction is completed."
+    ];
+
+    function addBlocks(sceneEl) {
+      const radius = 8;
+      const scene = sceneEl.object3D;
+      steps.forEach((text, i) => {
+        const angle = (i / steps.length) * Math.PI * 2;
+        const x = Math.cos(angle) * radius;
+        const z = Math.sin(angle) * radius;
+        const yText = (i % 2 === 0) ? 3.8 : 2.8;
+        const yBlock = (i % 2 === 0) ? 1.6 : 1.2;
+
+        const block = new THREE.Mesh(
+          new THREE.BoxGeometry(1.2, 1.2, 1.2),
+          new THREE.MeshPhongMaterial({
+            color: 0x0077ff, transparent: true, opacity: 0.8,
+            emissive: 0x00ffff, emissiveIntensity: 0.8
+          })
+        );
+        block.position.set(x, yBlock, z);
+        block.lookAt(0, 1.5, 0);
         scene.add(block);
-        const c=document.createElement("canvas");c.width=2048;c.height=512;
-        const ctx=c.getContext("2d");ctx.fillStyle="#050514";ctx.fillRect(0,0,c.width,c.height);
-        ctx.font="34px Arial";ctx.fillStyle="#00ffff";ctx.textAlign="center";
-        let line="",y=160,lineHeight=44;const words=text.split(" ");
-        for(let n=0;n<words.length;n++){const t=line+words[n]+" ";if(ctx.measureText(t).width>1800&&n>0){ctx.fillText(line,c.width/2,y);line=words[n]+" ";y+=lineHeight;}else line=t;}
-        ctx.fillText(line,c.width/2,y);
-        const tex=new THREE.CanvasTexture(c);
-        const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true});
-        const plane=new THREE.Mesh(new THREE.PlaneGeometry(7,1.8),mat);
-        plane.position.set(x,yText,z);
-        plane.lookAt(0,1.5,0);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = 2048; canvas.height = 512;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#050514"; ctx.fillRect(0, 0, 2048, 512);
+        ctx.font = "34px Arial"; ctx.fillStyle = "#00ffff"; ctx.textAlign = "center";
+        let line = "", y = 160, lineHeight = 44;
+        const words = text.split(" ");
+        for (let n = 0; n < words.length; n++) {
+          const test = line + words[n] + " ";
+          if (ctx.measureText(test).width > 1800 && n > 0) {
+            ctx.fillText(line, 1024, y); line = words[n] + " "; y += lineHeight;
+          } else line = test;
+        }
+        ctx.fillText(line, 1024, y);
+        const tex = new THREE.CanvasTexture(canvas);
+        const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true });
+        const plane = new THREE.Mesh(new THREE.PlaneGeometry(7, 1.8), mat);
+        plane.position.set(x, yText, z);
+        plane.lookAt(0, 1.5, 0);
         scene.add(plane);
       });
-    </script>
-  </a-scene>'></iframe>
+    }
+
+    document.querySelector("a-scene#sceneL").addEventListener("loaded", () => addBlocks(document.querySelector("#sceneL")));
+    document.querySelector("a-scene#sceneR").addEventListener("loaded", () => addBlocks(document.querySelector("#sceneR")));
+  </script>
 </body>
 </html>
