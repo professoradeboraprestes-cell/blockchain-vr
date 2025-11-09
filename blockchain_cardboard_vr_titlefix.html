@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Blockchain Cardboard VR 3D</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <style>
     body { margin: 0; background: #050514; }
@@ -11,35 +11,28 @@
       background-color: #00ffff !important;
       color: #000 !important;
       border: none !important;
+      font-weight: bold !important;
     }
   </style>
 </head>
 <body>
-  <a-scene vr-mode-ui="enabled: true" device-orientation-permission-ui="enabled: true">
-    <!-- ambiente -->
+  <a-scene
+    embedded
+    vr-mode-ui="enabled: true"
+    device-orientation-permission-ui="enabled: true">
+
+    <!-- background and light -->
     <a-sky color="#050514"></a-sky>
     <a-entity light="type: ambient; color: #00ffff; intensity: 1"></a-entity>
     <a-entity light="type: point; color: #00ffff; intensity: 2; distance: 50" position="0 5 5"></a-entity>
 
-    <!-- grid chão -->
+    <!-- ground grid -->
     <a-plane rotation="-90 0 0" width="50" height="50"
              material="wireframe:true; color:#0077ff; opacity:0.4"></a-plane>
 
-    <!-- blocos e textos -->
-    <a-entity id="blocks"></a-entity>
-
-    <!-- câmera com título fixo -->
-    <a-entity id="cameraRig" position="0 1.6 0">
+    <!-- camera rig -->
+    <a-entity id="rig" position="0 1.6 0">
       <a-entity camera look-controls></a-entity>
-      <a-text value="HOW BLOCKCHAIN WORKS"
-              position="0 1.5 -3"
-              width="6"
-              align="center"
-              color="#00ffff"
-              font="https://cdn.aframe.io/fonts/Exo2Bold-msdf.json"
-              shader="msdf"
-              negate="false">
-      </a-text>
     </a-entity>
 
     <script>
@@ -56,14 +49,37 @@
       const scene = document.querySelector("a-scene").object3D;
       const radius = 8;
 
+      // título fixo em canvas (para compatibilidade com XRViewer)
+      {
+        const canvas = document.createElement("canvas");
+        canvas.width = 2048;
+        canvas.height = 512;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#050514";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = "bold 90px Arial";
+        ctx.fillStyle = "#00ffff";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("HOW BLOCKCHAIN", canvas.width / 2, 190);
+        ctx.fillText("WORKS", canvas.width / 2, 320);
+
+        const tex = new THREE.CanvasTexture(canvas);
+        const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true });
+        const plane = new THREE.Mesh(new THREE.PlaneGeometry(10, 3), mat);
+        plane.position.set(0, 4, -6);
+        scene.add(plane);
+      }
+
+      // blocos e textos
       steps.forEach((text, i) => {
         const angle = (i / steps.length) * Math.PI * 2;
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
         const yBlock = (i % 2 === 0) ? 1.4 : 1.0;
-        const yText = (i % 2 === 0) ? 3.2 : 2.2;
+        const yText = (i % 2 === 0) ? 3.0 : 2.2;
 
-        // bloco brilhante
+        // bloco
         const block = new THREE.Mesh(
           new THREE.BoxGeometry(1, 1, 1),
           new THREE.MeshPhongMaterial({
@@ -90,7 +106,7 @@
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         const words = text.split(" ");
-        let line = "", y = 100, lineHeight = 48;
+        let line = "", y = 110, lineHeight = 46;
         for (let n = 0; n < words.length; n++) {
           const test = line + words[n] + " ";
           if (ctx.measureText(test).width > 900 && n > 0) {
@@ -103,7 +119,7 @@
 
         const texture = new THREE.CanvasTexture(canvas);
         const mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
-        const plane = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.6), mat);
+        const plane = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), mat);
         plane.position.set(x, yText, z);
         plane.lookAt(0, 1.6, 0);
         scene.add(plane);
